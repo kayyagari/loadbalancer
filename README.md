@@ -1,4 +1,6 @@
 ## LoadBalancer
+![ci](https://github.com/kayyagari/loadbalancer/workflows/ci/badge.svg)
+
 This is an implementation of a LoadBalancer that supports pluggable providers and load-balancing strategies.
 
 ## Building and Testing
