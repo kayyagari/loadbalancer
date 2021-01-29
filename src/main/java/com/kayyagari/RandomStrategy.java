@@ -3,6 +3,11 @@ package com.kayyagari;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * An implementation of random load-balancing strategy
+ *
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class RandomStrategy implements LoadBalancingStrategy {
 
     private Random rnd = new Random(System.currentTimeMillis());

@@ -2,6 +2,11 @@ package com.kayyagari;
 
 import java.util.List;
 
+/**
+ * An implementation of round-robin load-balancing strategy
+ *
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class RoundRobinStrategy implements LoadBalancingStrategy {
 
     /** index of the next provider to be selected */

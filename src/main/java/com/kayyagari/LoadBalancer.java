@@ -14,10 +14,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoadBalancer {
-    /** the active providers */
+    /** the list of active providers */
     private List<Provider> providers;
 
     // actually here I need a thread-safe Set but ConcurrentHashMap is better than CopyOnWriteArraySet
+    /** the inactive providers */
     private Map<String, Provider> inactiveProviders;
     
     /** the strategy to be used for balancing load */
@@ -77,6 +78,12 @@ public class LoadBalancer {
         return requestPool.submit(c);
     }
 
+    /**
+     * Adds the given provider to the list of active providers
+     * if the number of existing providers is less than {@link #MAX_NUM_PROVIDERS}
+     *
+     * @param p the provider to be added
+     */
     public synchronized void add(Provider p) {
         if(providers.size() == MAX_NUM_PROVIDERS) {
             throw new IllegalStateException("provider list is full, cannot add new providers. Only a maximum of 10 providers are allowed");
@@ -87,6 +94,12 @@ public class LoadBalancer {
         updateMaxReqCapacity();
     }
 
+    /**
+     * Excludes the provider from the active list of providers
+     * 
+     * @param p provider to be excluded
+     * @return true if excluded, false otherwise
+     */
     private synchronized boolean exclude(Provider p) {
          boolean excluded = providers.remove(p);
          if(excluded) {
@@ -97,6 +110,12 @@ public class LoadBalancer {
          return excluded;
     }
 
+    /**
+     * Includes the provider from the active list of providers
+     * 
+     * @param p provider to be included
+     * @return true if included, false otherwise
+     */
     private synchronized boolean include(Provider p) {
         Provider included = inactiveProviders.remove(p.id());
         if(included != null) {
@@ -107,7 +126,13 @@ public class LoadBalancer {
         return (included != null);
     }
 
-    // public API for manual inclusion
+    /**
+     * Same as {@link #include(Provider)} except for it is meant to
+     * be called by external clients
+     * 
+     * @param id ID of the provider to be included
+     * @return true if included, false otherwise
+     */
     public synchronized boolean include(String id) {
         Provider p = inactiveProviders.remove(id);
         if(p != null) {
@@ -120,7 +145,13 @@ public class LoadBalancer {
         return (p != null);
     }
 
-    // public API for manual exclusion
+    /**
+     * Same as {@link #exclude(Provider)} except for it is meant to
+     * be called by external clients
+     * 
+     * @param id ID of the provider to be excluded
+     * @return true if excluded, false otherwise
+     */
     public synchronized boolean exclude(String id) {
         for(Provider p : providers) {
             if(p.id().equals(id)) {
