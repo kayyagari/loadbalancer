@@ -10,7 +10,7 @@ Maven v3.6.0 and Java version >= 1.8 are needed to build and test. Please follow
 2. cd loadbalancer
 3. mvn clean test
 
-The tests will take about 30seconds to complete.
+The tests will take about 30seconds to complete (Github action is taking about 34 seconds).
 
 This project was tested using Java v1.8.0_162 on OS X v10.15.3. 
 Please note that the tests use and heavily rely on multiple threads so the outcome may likely differ
