@@ -2,6 +2,11 @@ package com.kayyagari;
 
 import java.util.UUID;
 
+/**
+ * A Provider that responds from get() method after the the given delay in milliseconds.
+ *
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class SlowResponseProviderImpl implements Provider {
     private String id;
     private long delay;

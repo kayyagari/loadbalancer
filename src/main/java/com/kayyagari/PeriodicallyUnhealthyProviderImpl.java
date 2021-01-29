@@ -2,6 +2,11 @@ package com.kayyagari;
 
 import java.util.UUID;
 
+/**
+ * A Provider that becomes "sick" regularly at the given interval
+ *
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class PeriodicallyUnhealthyProviderImpl implements Provider {
     private String id;
     private long intervalMillis;

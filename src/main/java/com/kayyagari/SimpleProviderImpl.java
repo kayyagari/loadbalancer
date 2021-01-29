@@ -1,5 +1,11 @@
 package com.kayyagari;
 
+/**
+ * A simple implementation of the Provider.
+ * The constructor was made to accept an integer for the sake of testability.
+ *
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ */
 public class SimpleProviderImpl implements Provider {
     private String id;
     

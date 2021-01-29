@@ -9,6 +9,14 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * The tests in this class cover the requirements mentioned in Steps 1 to 8.
+ * 
+ * LoadBalancerStressTest covers some additional concurrency related tests. 
+ * 
+ * @author Kiran Ayyagari (kayyagari@apache.org)
+ * @see LoadBalancerStressTest
+ */
 public class LoadBalancerTest {
     private LoadBalancer lb;
 
@@ -34,8 +42,11 @@ public class LoadBalancerTest {
         String randomVal = lb.get().get();
         assertTrue(randomVal.startsWith(prefix));
         
-        // change the strategy back to round-robin
-        lb.changeStrategy(new RoundRobinStrategy());
+        // test to ensure that RandomStrategy doesn't fail with IndexOutOfBoundsException
+        for(int i=0; i < 1000; i++) {
+            randomVal = lb.get().get();
+            assertTrue(randomVal.startsWith(prefix));
+        }
     }
 
     // Step 4 – Round Robin invocation

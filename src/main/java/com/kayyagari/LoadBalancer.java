@@ -13,27 +13,30 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- *
- */
 public class LoadBalancer {
+    /** the active providers */
     private List<Provider> providers;
 
     // actually here I need a thread-safe Set but ConcurrentHashMap is better than CopyOnWriteArraySet
     private Map<String, Provider> inactiveProviders;
     
-    private LoadBalancingStrategy strategy = new RoundRobinStrategy();
+    /** the strategy to be used for balancing load */
+    private LoadBalancingStrategy strategy;
 
+    /** threadpool for checking the heartbeats of providers */
     private ScheduledThreadPoolExecutor healthCheckExecutor;
 
+    /** threadpool for processing the incoming requests */
     private ThreadPoolExecutor requestPool;
 
     public static final int MAX_NUM_PROVIDERS = 10;
 
     public static final int MAX_REQ_PER_PROVIDER = 10;
 
+    /** used for monitoring the pending request in a naive way */
     private AtomicInteger pendingReqCount = new AtomicInteger(0);
 
+    /** used for storing the max request handling capacity of the LoadBalancer */
     private AtomicInteger maxReqCapacity = new AtomicInteger(0);
 
     public LoadBalancer(LoadBalancingStrategy strategy) {
@@ -48,10 +51,9 @@ public class LoadBalancer {
         requestPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(MAX_NUM_PROVIDERS);
     }
 
-    // 
+    // this method should not be synchronized
     public Future<String> get() {
-        int pending = pendingReqCount.get();
-        if(pending >= maxReqCapacity.get()) {
+        if(pendingReqCount.get() >= maxReqCapacity.get()) {
             throw new CapacityExceededException("processing capacity exceeded, max capacity = " + maxReqCapacity);
         }
 
@@ -132,19 +134,18 @@ public class LoadBalancer {
         return false;
     }
 
-    public LoadBalancingStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(LoadBalancingStrategy strategy) {
-        this.strategy = strategy;
-    }
-
+    /**
+     * updates the max request capacity. This should be called whenever the active providers list changes 
+     */
     private synchronized void updateMaxReqCapacity() {
         maxReqCapacity.set(providers.size() * MAX_REQ_PER_PROVIDER);
     }
 
-    /*default protected*/ static class HealthAwareProviderWrapper implements Provider {
+    /**
+     * A wrapper for Provider instances to help in handling the automatic exclusion and inclusion of
+     * wrapped Providers based on their health. 
+     */
+    private static class HealthAwareProviderWrapper implements Provider {
         private Provider wrapped;
         private LoadBalancer lb;
         private int successCount;
