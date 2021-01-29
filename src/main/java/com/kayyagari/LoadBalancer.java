@@ -33,6 +33,8 @@ public class LoadBalancer {
 
     public static final int MAX_REQ_PER_PROVIDER = 10;
 
+    public static final int HEART_BEAT_INTERVAL = 2;
+
     /** used for monitoring the pending request in a naive way */
     private AtomicInteger pendingReqCount = new AtomicInteger(0);
 
@@ -166,7 +168,7 @@ public class LoadBalancer {
         }
 
         private void enableHealthCheck() {
-            future = lb.healthCheckExecutor.scheduleWithFixedDelay(command, 0, 2, TimeUnit.SECONDS);
+            future = lb.healthCheckExecutor.scheduleWithFixedDelay(command, 0, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
         }
 
         // need to synchronize due to the requirement - Step 5 – Manual node exclusion / inclusion
